@@ -8,13 +8,6 @@ import (
 	"strings"
 )
 
-var (
-	portFlag int
-	dirFlag  string
-	certFile string
-	keyFile  string
-)
-
 var compressionTypes = map[string]string{
 	".gz": "gzip",
 }
@@ -41,21 +34,21 @@ func applyHeaders(w http.ResponseWriter, path string) {
 }
 
 func main() {
-	flag.IntVar(&portFlag, "port", 8080, "port to listen")
-	flag.StringVar(&dirFlag, "dir", ".", "directory to serve")
-	flag.StringVar(&certFile, "cert", "", "certificate file to use for TLS")
-	flag.StringVar(&keyFile, "key", "", "key file to use for TLS")
+	portPtr := flag.Int("port", 8080, "port to listen")
+	dirPtr := flag.String("dir", ".", "directory to serve")
+	certFilePtr := flag.String("cert", "", "certificate file to use for TLS")
+	keyFilePtr := flag.String("key", "", "key file to use for TLS")
 	flag.Parse()
 
-	isHttps := keyFile != "" && certFile != ""
+	isHttps := *certFilePtr != "" && *keyFilePtr != ""
 
 	if isHttps {
-		fmt.Printf("Serving %s\nListening on port: %d (https)\n", dirFlag, portFlag)
+		fmt.Printf("Serving %s\nListening on port: %d (https)\n", *dirPtr, *portPtr)
 	} else {
-		fmt.Printf("Serving %s\nListening on port: %d\n", dirFlag, portFlag)
+		fmt.Printf("Serving %s\nListening on port: %d\n", *dirPtr, *portPtr)
 	}
 
-	fileServer := http.FileServer(http.Dir(dirFlag))
+	fileServer := http.FileServer(http.Dir(*dirPtr))
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		applyHeaders(w, r.URL.Path)
@@ -66,8 +59,8 @@ func main() {
 	http.HandleFunc("/", handler)
 
 	if isHttps {
-		log.Fatal(http.ListenAndServeTLS(fmt.Sprintf(":%d", portFlag), certFile, keyFile, nil))
+		log.Fatal(http.ListenAndServeTLS(fmt.Sprintf(":%d", *portPtr), *certFilePtr, *keyFilePtr, nil))
 	} else {
-		log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", portFlag), nil))
+		log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *portPtr), nil))
 	}
 }
