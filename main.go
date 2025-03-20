@@ -43,8 +43,8 @@ func applyHeaders(w http.ResponseWriter, path string) {
 func main() {
 	flag.IntVar(&portFlag, "port", 8080, "port to listen")
 	flag.StringVar(&dirFlag, "dir", ".", "directory to serve")
-	flag.StringVar(&certFile, "cert", "", "certificate file to use")
-	flag.StringVar(&keyFile, "key", "", "key file to use")
+	flag.StringVar(&certFile, "cert", "", "certificate file to use for TLS")
+	flag.StringVar(&keyFile, "key", "", "key file to use for TLS")
 	flag.Parse()
 
 	isHttps := keyFile != "" && certFile != ""
