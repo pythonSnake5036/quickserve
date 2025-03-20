@@ -11,6 +11,8 @@ import (
 var (
 	portFlag int
 	dirFlag  string
+	certFile string
+	keyFile  string
 )
 
 var compressionTypes = map[string]string{
@@ -41,9 +43,17 @@ func applyHeaders(w http.ResponseWriter, path string) {
 func main() {
 	flag.IntVar(&portFlag, "port", 8080, "port to listen")
 	flag.StringVar(&dirFlag, "dir", ".", "directory to serve")
+	flag.StringVar(&certFile, "cert", "", "certificate file to use")
+	flag.StringVar(&keyFile, "key", "", "key file to use")
 	flag.Parse()
 
-	fmt.Printf("Serving %s\nListening on port: %d\n", dirFlag, portFlag)
+	isHttps := keyFile != "" && certFile != ""
+
+	if isHttps {
+		fmt.Printf("Serving %s\nListening on port: %d (https)\n", dirFlag, portFlag)
+	} else {
+		fmt.Printf("Serving %s\nListening on port: %d\n", dirFlag, portFlag)
+	}
 
 	fileServer := http.FileServer(http.Dir(dirFlag))
 
@@ -55,5 +65,9 @@ func main() {
 
 	http.HandleFunc("/", handler)
 
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", portFlag), nil))
+	if isHttps {
+		log.Fatal(http.ListenAndServeTLS(fmt.Sprintf(":%d", portFlag), certFile, keyFile, nil))
+	} else {
+		log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", portFlag), nil))
+	}
 }
