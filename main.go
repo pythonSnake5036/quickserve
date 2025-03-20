@@ -4,16 +4,14 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"mime"
 	"net/http"
+	"path/filepath"
 	"strings"
 )
 
 var compressionTypes = map[string]string{
 	".gz": "gzip",
-}
-
-var contentTypes = map[string]string{
-	".wasm": "application/wasm",
 }
 
 func applyHeaders(w http.ResponseWriter, path string) {
@@ -26,10 +24,10 @@ func applyHeaders(w http.ResponseWriter, path string) {
 		}
 	}
 
-	for ext, contentType := range contentTypes {
-		if strings.HasSuffix(path, ext) {
-			w.Header().Set("Content-Type", contentType)
-		}
+	ext := filepath.Ext(path)
+	mimeType := mime.TypeByExtension(ext)
+	if mimeType != "" {
+		w.Header().Set("Content-Type", mimeType)
 	}
 }
 
