@@ -32,6 +32,7 @@ func applyHeaders(w http.ResponseWriter, path string) {
 }
 
 func main() {
+	hostPtr := flag.String("host", "127.0.0.1", "host to listen on")
 	portPtr := flag.Int("port", 8080, "port to listen")
 	dirPtr := flag.String("dir", ".", "directory to serve")
 	certFilePtr := flag.String("cert", "", "certificate file to use for TLS")
@@ -57,8 +58,8 @@ func main() {
 	http.HandleFunc("/", handler)
 
 	if isHttps {
-		log.Fatal(http.ListenAndServeTLS(fmt.Sprintf(":%d", *portPtr), *certFilePtr, *keyFilePtr, nil))
+		log.Fatal(http.ListenAndServeTLS(fmt.Sprintf("%s:%d", *hostPtr, *portPtr), *certFilePtr, *keyFilePtr, nil))
 	} else {
-		log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *portPtr), nil))
+		log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%d", *hostPtr, *portPtr), nil))
 	}
 }
