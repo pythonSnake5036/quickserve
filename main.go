@@ -42,9 +42,9 @@ func main() {
 	isHttps := *certFilePtr != "" && *keyFilePtr != ""
 
 	if isHttps {
-		fmt.Printf("Serving %s\nListening on port: %d (https)\n", *dirPtr, *portPtr)
+		fmt.Printf("Serving %s\nListening on: %s:%d (https)\n", *dirPtr, *hostPtr, *portPtr)
 	} else {
-		fmt.Printf("Serving %s\nListening on port: %d\n", *dirPtr, *portPtr)
+		fmt.Printf("Serving %s\nListening on: %s:%d\n", *dirPtr, *hostPtr, *portPtr)
 	}
 
 	fileServer := http.FileServer(http.Dir(*dirPtr))
